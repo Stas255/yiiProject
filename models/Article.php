@@ -37,10 +37,11 @@ class Article extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description'], 'string'],
-            [['date'], 'safe'],
+            [['title','description','tag','viewed','topic_id','user_id'], 'required'],
+            [['title','description'], 'string'],
+            [['date'], 'date', 'format'=>'php:Y-m-d'],
+            [['date'], 'default', 'value'=>date('Y-m-d')],
             [['viewed', 'topic_id', 'user_id'], 'integer'],
-            [['title', 'image', 'tag'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['topic_id'], 'exist', 'skipOnError' => true, 'targetClass' => Topic::className(), 'targetAttribute' => ['topic_id' => 'id']],
         ];
