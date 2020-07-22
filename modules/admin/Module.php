@@ -12,7 +12,32 @@ class Module extends \yii\base\Module
      */
     public $layout = '/admin';
     public $controllerNamespace = 'app\modules\admin\controllers';
-
+    public function behaviors()
+    {
+        return [
+            'access'    =>  [
+                'class' =>  AccessControl::className(),
+                'denyCallback'  =>  function($rule, $action)
+                {
+                    throw new \yii\web\NotFoundHttpException();
+                },
+                'rules' =>  [
+                    [
+                        'allow' =>  true,
+                        'matchCallback' =>  function($rule, $action)
+                        {
+                            if (isset(Yii::$app->user->identity->login)){
+                                return (Yii::$app->user->identity->login == 'stas@gmail.com');
+                            }
+                            else{
+                                return false;
+                            }
+                        }
+                    ]
+                ]
+            ]
+        ];
+    }
     /**
      * {@inheritdoc}
      */
