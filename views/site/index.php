@@ -34,5 +34,5 @@
 </div>
 
 <?php
-echo \Yii::$app->view->renderFile('@app/views/site/right.php');
+echo \Yii::$app->view->renderFile('@app/views/site/right.php',  compact('popular','recent','topics'));
 ?>
