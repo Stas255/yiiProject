@@ -109,7 +109,7 @@ class SiteController extends Controller
             return ($k['comment_id'] != null && !$k['delete']);
         });
         $commentForm = new CommentForm();
-
+        $article->viewedCounter();
         return $this->render('single', [
             'article' => $article,
             'popular' => $popular,
