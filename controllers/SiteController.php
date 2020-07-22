@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Article;
+use app\models\Comment;
+use app\models\CommentForm;
 use app\models\Topic;
 use Yii;
 use yii\data\Pagination;
@@ -99,13 +101,51 @@ class SiteController extends Controller
         $recent = Article::find()->orderBy('date desc')->limit(3)->all();
         $topics = Topic::find()->all();
 
+        $comments = $article->comments;
+        $commentsParent = array_filter($comments, function ($k) {
+            return $k['comment_id'] == null;
+        });
+        $commentsChild = array_filter($comments, function ($k) {
+            return ($k['comment_id'] != null && !$k['delete']);
+        });
+        $commentForm = new CommentForm();
+
         return $this->render('single', [
             'article' => $article,
             'popular' => $popular,
             'recent' => $recent,
             'topics' => $topics,
+            'commentsParent' => $commentsParent,
+            'commentsChild' => $commentsChild,
+            'commentForm' => $commentForm,
         ]);
     }
+
+    public function actionComment($id, $id_comment = null)
+    {
+        $model = new CommentForm();
+
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            if ($model->saveComment($id, $id_comment)) {
+                return $this->redirect(['site/view', 'id' => $id]);
+            }
+        }
+    }
+    public function actionCommentDelete($id, $id_comment)
+    {
+        if(Yii::$app->request->isPost){
+            $data = Comment::findOne($id_comment);
+            if($data->user_id == Yii::$app->user->id){
+                $data->delete = true;
+                $data-> save(false);
+            }
+            return $this->redirect(['site/view', 'id' => $id]);
+        }
+    }
+
+
+
     public function actionTopic($id)
     {
         $query = Article::find()->where(['topic_id'=>$id]);
